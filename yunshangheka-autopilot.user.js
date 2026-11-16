@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         云上河开 全自动推进器
 // @namespace    local.yunshangheka.autopilot
-// @version      1.0.0
+// @version      1.1.2
 // @description  1x自动播放 + 自动关完成弹窗 + 自动跳下一个资源
 // @match        *://*.open.ha.cn/jxpt-web/student/activity/*
 // @grant        none
@@ -15,7 +15,7 @@
     rate: 1,
     muted: true,
     docWait: 45000,
-    endedWait: 20000,
+    endedWait: 40000,
     skipTask: true,
     poll: 2000
   };
@@ -205,11 +205,14 @@
       return;
     }
 
-    /* 视频结束但没弹窗 */
+    /* 视频结束：等弹窗，40 秒没来就跳 */
     if (S.endedAt) {
-      var ed = Date.now() - S.endedAt;
-      if (ed > CFG.endedWait) go('视频结束超时');
-      else say('视频已播完，等弹窗 ' + Math.round((CFG.endedWait - ed) / 1000) + 's', 2);
+      var edMs = Date.now() - S.endedAt;
+      if (edMs > CFG.endedWait) {
+        go('播完后 ' + Math.round(CFG.endedWait / 1000) + 's 无弹窗');
+      } else {
+        say('视频已播完，等弹窗 ' + Math.round(edMs / 1000) + 's / ' + Math.round(CFG.endedWait / 1000) + 's', 2);
+      }
       return;
     }
 
